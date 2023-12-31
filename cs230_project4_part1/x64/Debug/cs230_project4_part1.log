@@ -1,0 +1,8 @@
+﻿  cs230_project4_part1.cpp
+C:\Users\faid_\source\repos\cs230_project4_part1\cs230_project4_part1\cs230_project4_part1.cpp(50,35): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\faid_\source\repos\cs230_project4_part1\cs230_project4_part1\cs230_project4_part1.cpp(59,28): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\faid_\source\repos\cs230_project4_part1\cs230_project4_part1\cs230_project4_part1.cpp(60,28): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+  Matrix3x3.cpp
+  Vector2D.cpp
+  Generating Code...
+  cs230_project4_part1.vcxproj -> C:\Users\faid_\source\repos\cs230_project4_part1\x64\Debug\cs230_project4_part1.exe

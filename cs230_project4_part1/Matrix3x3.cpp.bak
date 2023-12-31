@@ -1,0 +1,250 @@
+/******************************************************************************/
+/*!
+\file		Matrix3x3.cpp
+\author 	Shaikh Faid Bin Omar, shaikhfaid.binomar, 390003019
+\par    	email: shaikhfaid.binomar@digipen.edu
+\date   	July 26, 2020
+\brief
+
+Copyright (C) 2020 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior
+written consent of DigiPen Institute of Technology is prohibited.
+ */
+ /******************************************************************************/
+
+#include "Matrix3x3.h"
+#include <cmath>
+#include <cstdio>
+
+#define EPSILON		0.0001f
+#define PI			3.14159265358f
+
+using namespace CS230;
+
+/* create the conversion constructor */
+Matrix3x3::Matrix3x3(const float* pArr)
+{
+	/* loop throughout the entire 3x3 matrix and assign */
+	for (unsigned int i = 0; i < 9; ++i)
+	{
+		this->m[i] = *pArr++;
+	}
+}
+
+/* create the conversion constructor */
+CS230::Matrix3x3::Matrix3x3(float _00, float _01, float _02, 
+							float _10, float _11, float _12, 
+							float _20, float _21, float _22)
+							: m00(_00), m01(_01), m02(_02), 
+							m10(_10), m11(_11), m12(_12), 
+							m20(_20), m21(_21), m22(_22) {}
+
+/* creating the assignment operator = */
+Matrix3x3& CS230::Matrix3x3::operator=(const Matrix3x3& rhs)
+{
+	/* loop throughout the entire 3x3 matrix and assign to this */
+	for (unsigned int i = 0; i < 9; ++i)
+	{
+		this->m[i] = rhs.m[i];
+	}
+	return *this;
+}
+
+/* creating the multiply assignment operator * */
+Matrix3x3& CS230::Matrix3x3::operator*=(const Matrix3x3& rhs)
+{
+	/* loop through the matrix 3x3 and assign and add accordingly */
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		for (unsigned int j = 0; j < 3; j++)
+		{
+			float sum = 0;
+			for (unsigned int k = 0; k < 3; k++)
+				sum = sum + this->m[i * 3 + k] * rhs.m[k * 3 + j];
+			this->m[i * 3 + j] = sum;
+		}
+	}
+	return *this;
+}
+
+/* creating the multiply operator * */
+Matrix3x3 CS230::operator*(const Matrix3x3& lhs, const Matrix3x3& rhs)
+{
+	Matrix3x3 mul;
+	/* loop through the matrix 3x3 and assign and add accordingly */
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		for (unsigned int j = 0; j < 3; j++)
+		{
+			float sum = 0;
+			for (int k = 0; k < 3; k++)
+				sum = sum + (lhs.m[i * 3 + k] * rhs.m[k * 3 + j]);
+			mul.m[i * 3 + j] = sum;
+		}
+	}
+	return mul;
+}
+
+/* creating the multiply operator * */
+Vector2D CS230::operator*(const Matrix3x3& pMtx, const Vector2D& rhs)
+{
+	Vector2D mul;
+	/* assign mul to the operation of vector and matrix multiplication 
+		and return mul as the result of the operation */
+	mul.x = (pMtx.m00 * rhs.x) + (pMtx.m01 * rhs.y) + (pMtx.m02 * 1.0f);
+	mul.y = (pMtx.m10 * rhs.x) + (pMtx.m11 * rhs.y) + (pMtx.m12 * 1.0f);
+
+	return mul;
+}
+
+/* creating the identity matrix */
+void CS230::Mtx33Identity(Matrix3x3& pResult)
+{
+	/* create a sample of the identity matrix */
+	Mtx33 identity =
+	{
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};
+
+	/* assign the created identity matrix to pResult */
+	for (unsigned int i = 0; i < 9; ++i)
+	{
+		pResult.m[i] = identity.m[i];
+	}
+}
+
+/* creating the translation matrix */
+void CS230::Mtx33Translate(Matrix3x3& pResult, float x, float y)
+{
+	/* create a sample of the identity matrix */
+	Mtx33 translate =
+	{
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};
+
+	/* assign the created identity matrix to pResult */
+	for (unsigned int i = 0; i < 9; ++i)
+	{
+		pResult.m[i] = translate.m[i];
+	}
+	/* modify the value x and y to be translated accordingly */
+	pResult.m[2] = x;
+	pResult.m[5] = y;
+}
+
+/* creating the scaling matrix */
+void CS230::Mtx33Scale(Matrix3x3& pResult, float x, float y)
+{
+	/* create a sample of the identity matrix */
+	Mtx33 scale =
+	{
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};
+
+	/* assign the created identity matrix to pResult */
+	for (unsigned int i = 0; i < 9; ++i)
+	{
+		pResult.m[i] = scale.m[i];
+	}
+	/* modify the value x and y to be scaled accordingly */
+	pResult.m[0] = x;
+	pResult.m[4] = y;
+}
+
+/* creating the rotation in radians matrix */
+void CS230::Mtx33RotRad(Matrix3x3& pResult, float angle)
+{
+	/* create a sample of a default rotation matrix */
+	Mtx33 rotation =
+	{
+		cosf(angle),	-sinf(angle),	0.0f,
+		sinf(angle),	cosf(angle),	0.0f,
+			0.0f,		0.0f,			1.0f
+	};
+
+	/* assign the created matrix to pResult */
+	for (int i = 0; i < 9; i++)
+	{
+		pResult.m[i] = rotation.m[i];
+	}
+}
+
+/* creating the rotation in degree matrix */
+void CS230::Mtx33RotDeg(Matrix3x3& pResult, float angle)
+{
+	/* calculate angle to be in radian */
+	float rotDegree = (angle / 360) * (2 * PI);
+
+	/* create a sample of a default rotation matrix */
+	Mtx33 rotation =
+	{
+		cosf(rotDegree),	-sinf(rotDegree),	0.0f,
+		sinf(rotDegree),	cosf(rotDegree),	0.0f,
+			0.0f,			0.0f,				1.0f
+	};
+	/* assign the created matrix to pResult */
+	for (int i = 0; i < 9; i++)
+	{
+		pResult.m[i] = rotation.m[i];
+	}
+}
+
+/* creating the transpose matrix */
+void CS230::Mtx33Transpose(Matrix3x3& pResult, const Matrix3x3& pMtx)
+{
+	/* loop through the whole matrix and rearrange it */
+	for (unsigned int i = 0; i < 3; ++i)
+	{
+		for (unsigned int j = 0; j < 3; ++j)
+		{
+			pResult.m[j * 3 + i] = pMtx.m[i * 3 + j];
+		}
+	}
+}
+
+/* creating the inverse matrix */
+void CS230::Mtx33Inverse(Matrix3x3* pResult, float* determinant, const Matrix3x3& pMtx)
+{
+	/* temporary var to store calculated matrix */
+	Mtx33 inverse;
+
+	/* calculate the determinant with given matrix to be used later on */
+	float det1 = pMtx.m00 * (pMtx.m11 * pMtx.m22 - pMtx.m21 * pMtx.m12)
+				-pMtx.m01 * (pMtx.m10 * pMtx.m22 - pMtx.m12 * pMtx.m20)
+				+pMtx.m02 * (pMtx.m10 * pMtx.m21 - pMtx.m11 * pMtx.m20);
+
+	/* assign the calculated determinant to the address of determinant */
+	*determinant = det1;
+
+	/* check if det1 is less than EPSILON - avoid division by zero */
+	if (det1 < EPSILON)
+	{
+		pResult = nullptr;
+		return;
+	}
+	/* create the inverse determinant */
+	float det = 1 / det1;
+
+	/* calculate the inverse matrix */
+	inverse.m00 = (pMtx.m11 * pMtx.m22 - pMtx.m21 * pMtx.m12) * det;
+	inverse.m01 = (pMtx.m02 * pMtx.m21 - pMtx.m01 * pMtx.m22) * det;
+	inverse.m02 = (pMtx.m01 * pMtx.m12 - pMtx.m02 * pMtx.m11) * det;
+	inverse.m10 = (pMtx.m12 * pMtx.m20 - pMtx.m10 * pMtx.m22) * det;
+	inverse.m11 = (pMtx.m00 * pMtx.m22 - pMtx.m02 * pMtx.m20) * det;
+	inverse.m12 = (pMtx.m10 * pMtx.m02 - pMtx.m00 * pMtx.m12) * det;
+	inverse.m20 = (pMtx.m10 * pMtx.m21 - pMtx.m20 * pMtx.m11) * det;
+	inverse.m21 = (pMtx.m20 * pMtx.m01 - pMtx.m00 * pMtx.m21) * det;
+	inverse.m22 = (pMtx.m00 * pMtx.m11 - pMtx.m10 * pMtx.m01) * det;
+
+	/* assign the calculated inverse matrix to pResult */
+	for (unsigned int i = 0; i < 9; ++i)
+	{
+		pResult->m[i] = inverse.m[i];
+	}
+}
